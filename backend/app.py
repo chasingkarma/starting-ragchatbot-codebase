@@ -71,6 +71,7 @@ async def query_documents(request: QueryRequest):
             session_id=session_id
         )
     except Exception as e:
+        print("Query error:", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/courses", response_model=CourseStats)
@@ -83,6 +84,7 @@ async def get_course_stats():
             course_titles=analytics["course_titles"]
         )
     except Exception as e:
+        print("Query error:", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.on_event("startup")
