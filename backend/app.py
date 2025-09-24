@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Union, Dict, Any
 import os
 
 from config import config
@@ -43,13 +43,34 @@ class QueryRequest(BaseModel):
 class QueryResponse(BaseModel):
     """Response model for course queries"""
     answer: str
-    sources: List[str]
+    sources: List[Union[str, Dict[str, Any]]]  # Support both string and object sources
     session_id: str
 
 class CourseStats(BaseModel):
     """Response model for course statistics"""
     total_courses: int
     course_titles: List[str]
+
+class ClearSessionRequest(BaseModel):
+    """Request model for clearing a session"""
+    session_id: str
+
+class ClearSessionResponse(BaseModel):
+    """Response model for clearing a session"""
+    success: bool
+    message: str
+
+class CourseOutlineRequest(BaseModel):
+    """Request model for course outline"""
+    course_title: str
+
+class CourseOutlineResponse(BaseModel):
+    """Response model for course outline"""
+    course_title: str
+    course_link: Optional[str]
+    lessons: List[Dict[str, Any]]
+    total_lessons: int
+    formatted_outline: str
 
 # API Endpoints
 
@@ -85,6 +106,57 @@ async def get_course_stats():
         )
     except Exception as e:
         print("Query error:", e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/clear_session", response_model=ClearSessionResponse)
+async def clear_session(request: ClearSessionRequest):
+    """Clear a conversation session"""
+    try:
+        rag_system.session_manager.clear_session(request.session_id)
+        return ClearSessionResponse(
+            success=True,
+            message="Session cleared successfully"
+        )
+    except Exception as e:
+        print("Clear session error:", e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/course_outline", response_model=CourseOutlineResponse)
+async def get_course_outline(request: CourseOutlineRequest):
+    """Get course outline directly from vector store (fast)"""
+    try:
+        # Use the CourseOutlineTool directly for fast access
+        result = rag_system.outline_tool.execute(request.course_title)
+
+        # If it's an error message, throw HTTP exception
+        if result.startswith("No course found") or result.startswith("No courses available"):
+            raise HTTPException(status_code=404, detail=result)
+
+        # Get the raw course metadata for structured response
+        all_courses = rag_system.vector_store.get_all_courses_metadata()
+        matching_course = None
+        course_title_lower = request.course_title.lower()
+
+        # Find matching course
+        for course in all_courses:
+            if course.get('title', '').lower() == course_title_lower or course_title_lower in course.get('title', '').lower():
+                matching_course = course
+                break
+
+        if not matching_course:
+            raise HTTPException(status_code=404, detail=f"Course not found: {request.course_title}")
+
+        return CourseOutlineResponse(
+            course_title=matching_course.get('title', 'Unknown'),
+            course_link=matching_course.get('course_link'),
+            lessons=matching_course.get('lessons', []),
+            total_lessons=len(matching_course.get('lessons', [])),
+            formatted_outline=result
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Course outline error:", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.on_event("startup")
