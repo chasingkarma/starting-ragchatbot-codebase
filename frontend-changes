@@ -1,0 +1,108 @@
+# Toggle Button Design - Frontend Changes
+
+## Summary
+Implemented a modern theme toggle button with sun/moon icons positioned in the top-right corner of the header. The toggle allows users to switch between dark and light themes with smooth animations and maintains their preference in localStorage.
+
+## Files Modified
+
+### 1. frontend/index.html
+**Changes:**
+- Modified header structure to include a header-content wrapper with flex layout
+- Added theme toggle button with sun and moon SVG icons
+- Made header visible (was previously hidden)
+- Added proper semantic structure with aria-label for accessibility
+
+**Key additions:**
+- `<div class="header-content">` wrapper for flex layout
+- `<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">` with icon structure
+- Sun and moon SVG icons with proper viewBox and stroke styling
+
+### 2. frontend/style.css
+**Changes:**
+- Made header visible and styled with proper padding and borders
+- Added complete CSS for theme toggle button including:
+  - Modern toggle switch design with track and slider
+  - Smooth animations using cubic-bezier transitions
+  - Icon rotation and opacity transitions
+  - Hover and focus states for accessibility
+  - Active state styling when toggled
+- Updated responsive design for mobile devices
+- Maintained design consistency with existing color scheme
+
+**Key CSS additions:**
+- `.header-content` - Flex layout for header with space-between
+- `.theme-toggle` - Main button styling with focus management
+- `.toggle-track` - Background track for the toggle switch
+- `.toggle-slider` - Animated slider element that moves on toggle
+- `.sun-icon` / `.moon-icon` - Icon styling with rotation animations
+- Mobile responsive adjustments for header layout
+
+### 3. frontend/script.js
+**Changes:**
+- Added themeToggle DOM element reference
+- Added theme toggle event listeners (click and keyboard navigation)
+- Implemented complete theme system with:
+  - `initializeThemeToggle()` - Loads saved preference and sets initial state
+  - `toggleTheme()` - Handles theme switching and localStorage persistence
+  - `applyTheme()` - Dynamically updates CSS custom properties
+- Added keyboard accessibility (Enter and Space key support)
+- Theme preference persistence using localStorage
+
+**Key functions added:**
+- `initializeThemeToggle()` - Sets up initial theme state
+- `toggleTheme()` - Main toggle function with state management
+- `applyTheme(theme)` - Dynamic CSS variable updates for light/dark themes
+
+## Features Implemented
+
+### 1. Visual Design
+- ✅ Modern toggle switch design that fits existing aesthetic
+- ✅ Sun/moon icon system with smooth transitions
+- ✅ Positioned in top-right corner of header
+- ✅ Consistent with existing color scheme and styling
+
+### 2. Animations
+- ✅ Smooth slider transition (300ms cubic-bezier)
+- ✅ Icon rotation and opacity changes
+- ✅ Hover effects with color and border transitions
+- ✅ Focus states for accessibility
+
+### 3. Accessibility
+- ✅ Proper ARIA labels that update based on current state
+- ✅ Keyboard navigation support (Enter and Space keys)
+- ✅ Focus indicators with box-shadow
+- ✅ Semantic button element
+
+### 4. Functionality
+- ✅ Theme switching between dark and light modes
+- ✅ LocalStorage persistence of user preference
+- ✅ Dynamic CSS custom property updates
+- ✅ Proper state management and DOM updates
+
+### 5. Responsive Design
+- ✅ Mobile-friendly layout adjustments
+- ✅ Header stacks vertically on small screens
+- ✅ Toggle button repositioned appropriately
+
+## Theme Colors
+
+### Dark Theme (Default)
+- Background: #0f172a
+- Surface: #1e293b
+- Text Primary: #f1f5f9
+- Text Secondary: #94a3b8
+- Border: #334155
+
+### Light Theme
+- Background: #ffffff
+- Surface: #f8fafc
+- Text Primary: #0f172a
+- Text Secondary: #475569
+- Border: #e2e8f0
+
+## User Experience
+- Users can click the toggle to switch themes
+- Theme preference is remembered across sessions
+- Visual feedback with smooth animations
+- Accessible for keyboard users
+- Consistent with modern UI patterns

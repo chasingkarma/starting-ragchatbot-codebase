@@ -5,7 +5,7 @@ const API_URL = '/api';
 let currentSessionId = null;
 
 // DOM elements
-let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatButton;
+let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatButton, themeToggle;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,8 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
     totalCourses = document.getElementById('totalCourses');
     courseTitles = document.getElementById('courseTitles');
     newChatButton = document.getElementById('newChatButton');
+    themeToggle = document.getElementById('themeToggle');
     
     setupEventListeners();
+    initializeThemeToggle();
     createNewSession();
     loadCourseStats();
 });
@@ -32,6 +34,15 @@ function setupEventListeners() {
 
     // New chat button
     newChatButton.addEventListener('click', clearCurrentChat);
+
+    // Theme toggle button
+    themeToggle.addEventListener('click', toggleTheme);
+    themeToggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleTheme();
+        }
+    });
 
     // Suggested questions
     document.querySelectorAll('.suggested-item').forEach(button => {
@@ -299,5 +310,72 @@ async function loadCourseStats() {
         if (courseTitles) {
             courseTitles.innerHTML = '<span class="error">Failed to load courses</span>';
         }
+    }
+}
+
+// Theme Toggle Functions
+function initializeThemeToggle() {
+    // Load saved theme preference or default to 'dark'
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+    
+    // Update toggle button state
+    if (savedTheme === 'light') {
+        themeToggle.classList.add('active');
+        themeToggle.setAttribute('aria-label', 'Switch to dark theme');
+    } else {
+        themeToggle.classList.remove('active');
+        themeToggle.setAttribute('aria-label', 'Switch to light theme');
+    }
+}
+
+function toggleTheme() {
+    const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    applyTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    // Update toggle button state with animation
+    if (newTheme === 'light') {
+        themeToggle.classList.add('active');
+        themeToggle.setAttribute('aria-label', 'Switch to dark theme');
+    } else {
+        themeToggle.classList.remove('active');
+        themeToggle.setAttribute('aria-label', 'Switch to light theme');
+    }
+}
+
+function applyTheme(theme) {
+    document.body.setAttribute('data-theme', theme);
+    
+    if (theme === 'light') {
+        // Apply light theme colors
+        document.documentElement.style.setProperty('--primary-color', '#2563eb');
+        document.documentElement.style.setProperty('--primary-hover', '#1d4ed8');
+        document.documentElement.style.setProperty('--background', '#ffffff');
+        document.documentElement.style.setProperty('--surface', '#f8fafc');
+        document.documentElement.style.setProperty('--surface-hover', '#e2e8f0');
+        document.documentElement.style.setProperty('--text-primary', '#0f172a');
+        document.documentElement.style.setProperty('--text-secondary', '#475569');
+        document.documentElement.style.setProperty('--border-color', '#e2e8f0');
+        document.documentElement.style.setProperty('--user-message', '#2563eb');
+        document.documentElement.style.setProperty('--assistant-message', '#f1f5f9');
+        document.documentElement.style.setProperty('--shadow', '0 4px 6px -1px rgba(0, 0, 0, 0.1)');
+        document.documentElement.style.setProperty('--focus-ring', 'rgba(37, 99, 235, 0.2)');
+    } else {
+        // Apply dark theme colors (default)
+        document.documentElement.style.setProperty('--primary-color', '#2563eb');
+        document.documentElement.style.setProperty('--primary-hover', '#1d4ed8');
+        document.documentElement.style.setProperty('--background', '#0f172a');
+        document.documentElement.style.setProperty('--surface', '#1e293b');
+        document.documentElement.style.setProperty('--surface-hover', '#334155');
+        document.documentElement.style.setProperty('--text-primary', '#f1f5f9');
+        document.documentElement.style.setProperty('--text-secondary', '#94a3b8');
+        document.documentElement.style.setProperty('--border-color', '#334155');
+        document.documentElement.style.setProperty('--user-message', '#2563eb');
+        document.documentElement.style.setProperty('--assistant-message', '#374151');
+        document.documentElement.style.setProperty('--shadow', '0 4px 6px -1px rgba(0, 0, 0, 0.3)');
+        document.documentElement.style.setProperty('--focus-ring', 'rgba(37, 99, 235, 0.2)');
     }
 }
