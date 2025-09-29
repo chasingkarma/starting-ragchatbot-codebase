@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 from dotenv import load_dotenv
 
@@ -28,8 +28,8 @@ class Config:
     CHROMA_PATH: str = "./chroma_db"  # ChromaDB storage location
 
     # Security settings
-    ALLOWED_ORIGINS: List[str] = os.getenv("ALLOWED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000").split(",")
-    ALLOWED_HOSTS: List[str] = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+    ALLOWED_ORIGINS: List[str] = field(default_factory=lambda: os.getenv("ALLOWED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000").split(","))
+    ALLOWED_HOSTS: List[str] = field(default_factory=lambda: os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(","))
 
     # Environment
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
